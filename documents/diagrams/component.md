@@ -49,7 +49,7 @@ graph LR
   %% 3. Workers (Celery)
   subgraph Workers
     FeedWorker[Feed Worker]
-    NotifyWorker[Notify Worker]
+    NotifyWorker[Notification Worker]
     MediaWorker[Media Worker]
   end
 
@@ -85,7 +85,7 @@ graph LR
   end
 
   %% 모니터링/로깅
-  Monitor -- 메트릭 수집 --> API & Infra & Workers
-  Log -- 로그 수집 --> API & Infra & Workers
-  API & Infra & Workers -- 스팬 전송 --> Trace
+  API & Infra & Workers -- 데이터 전달 --> Trace
+  Trace -- 메트릭 수집 --> Monitor
+  Trace -- 로그 수집 --> Log
 ```
