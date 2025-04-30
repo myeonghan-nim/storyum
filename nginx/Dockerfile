@@ -6,4 +6,6 @@ RUN apt-get update \
 
 WORKDIR /etc/nginx
 
+RUN rm /etc/nginx/conf.d/default.conf
+
 CMD ["sh", "-c", "envsubst '$NGINX_PORT $WEB_PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"]

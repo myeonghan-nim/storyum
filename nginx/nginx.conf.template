@@ -26,11 +26,12 @@ http {
     }
 
     server {
-        listen ${NGINX_PORT};
+        listen ${NGINX_PORT} default_server;
+        listen [::]:${NGINX_PORT} default_server;
         server_name localhost;
 
         location /static/ {
-            alias /usr/src/app/static/;
+            alias /app/static/;
         }
 
         location / {
