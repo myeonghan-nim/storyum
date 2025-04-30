@@ -36,13 +36,12 @@ services:
       - .env
     expose:
       - "${WEB_PORT:-8000}"
-    volumes:
-      - ./app:/usr/src/app
     depends_on:
       - db
       - redis
     networks:
       - inner
+      - outer
 
   nginx:
     build:
@@ -60,7 +59,6 @@ services:
       - web
     networks:
       - outer
-      - inner
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -80,8 +78,6 @@ services:
       dockerfile: Dockerfile
     container_name: storyum_celery
     command: celery -A config worker -l info
-    volumes:
-      - ./app:/usr/src/app
     env_file:
       - .env
     depends_on:
