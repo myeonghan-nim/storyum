@@ -36,6 +36,8 @@ services:
       - .env
     expose:
       - "${WEB_PORT:-8000}"
+    volumes:
+      - web_data_static:/app/static
     depends_on:
       - db
       - redis
@@ -50,11 +52,15 @@ services:
     container_name: storyum_nginx
     environment:
       - NGINX_PORT
+      - NGINX_SSL_PORT
       - WEB_PORT
     ports:
       - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - web_data_static:/app/static
     depends_on:
       - web
     networks:
@@ -71,24 +77,25 @@ services:
       - "${RABBITMQ_MANAGEMENT_PORT:-15672}"
     networks:
       - inner
-
-  celery:
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    container_name: storyum_celery
-    command: celery -A config worker -l info
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - redis
-      - rabbitmq
-    networks:
-      - inner
+  # TODO: enable this service
+  # celery:
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile
+  #   container_name: storyum_celery
+  #   command: celery -A config worker -l info
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - rabbitmq
+  #   networks:
+  #     - inner
 
 volumes:
   postgres_data:
+  web_data_static:
 
 
 networks:

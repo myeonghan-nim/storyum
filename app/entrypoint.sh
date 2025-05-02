@@ -6,9 +6,8 @@ set -e
 echo ">>> Migration"
 python manage.py migrate --noinput
 
-# TODO: static files if needed
-# echo ">>> Collect static files"
-# python manage.py collectstatic --noinput
+echo ">>> Collect static files"
+python manage.py collectstatic --noinput
 
 echo ">>> Starting server"
 exec gunicorn storyum.wsgi:application --config ./gunicorn.py
