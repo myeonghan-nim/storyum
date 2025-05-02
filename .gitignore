@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/django,python,visualstudiocode,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,python,visualstudiocode,linux
 
+### certs ###
+*.crt
+*.key
+
 ### Django ###
 *.log
 *.pot
