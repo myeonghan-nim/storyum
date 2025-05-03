@@ -49,18 +49,25 @@ http {
         add_header X-Frame-Options DENY              always;
         add_header X-Content-Type-Options nosniff    always;
         add_header Referrer-Policy "no-referrer-when-downgrade" always;
-        add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:;" always;
+        add_header Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:;" always;
 
         location /static/ {
             alias /app/static/;
         }
 
         location / {
-            proxy_pass http://storyum_web;
+            proxy_pass https://storyum_web;
+
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_ssl_protocols       TLSv1.2 TLSv1.3;
+            proxy_ssl_trusted_certificate /etc/nginx/ssl/storyum_internal_ca.crt;
+            proxy_ssl_verify         on;
+            proxy_ssl_verify_depth   2;
+            proxy_ssl_server_name    on;
         }
     }
 }
