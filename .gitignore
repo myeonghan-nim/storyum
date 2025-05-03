@@ -3,6 +3,7 @@
 
 ### certs ###
 *.crt
+*.csr
 *.key
 
 ### Django ###
