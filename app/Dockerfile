@@ -8,6 +8,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY ssl /app/ssl
 COPY storyum /app/storyum
 COPY entrypoint.sh /app/entrypoint.sh
 COPY gunicorn.py /app/gunicorn.py
