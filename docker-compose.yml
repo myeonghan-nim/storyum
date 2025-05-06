@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:14
+    build:
+      context: ./postgresql
+      dockerfile: Dockerfile
     container_name: storyum_db
     environment:
       - POSTGRES_PORT
@@ -12,6 +14,7 @@ services:
     expose:
       - "${POSTGRES_PORT:-5432}"
     volumes:
+      - ./nginx/ssl/storyum_internal_ca.crt:/var/lib/postgresql/ssl/storyum_internal_ca.crt:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
       - inner
@@ -37,6 +40,7 @@ services:
     expose:
       - "${WEB_PORT:-8000}"
     volumes:
+      - ./nginx/ssl/storyum_internal_ca.crt:/app/ssl/storyum_internal_ca.crt:ro
       - web_data_static:/app/static
     depends_on:
       - db
