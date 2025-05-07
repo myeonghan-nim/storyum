@@ -48,7 +48,10 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "django_filters",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     # inner apps
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -182,6 +185,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -204,3 +208,19 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
 X_FRAME_OPTIONS = "DENY"
+
+
+# drf-spectacular
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Storyum API",
+    "DESCRIPTION": "스토리움(Storyum) SNS 서비스 API 문서",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SECURITY": [{"Bearer": []}],
+    "COMPONENT_SPLIT_REQUEST": True,
+    "COMPONENT_SPLIT_PATCH": True,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+}
