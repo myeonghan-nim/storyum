@@ -2,8 +2,10 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,python,visualstudiocode,linux
 
 ### certs ###
+*.cnf
 *.crt
 *.csr
+*.srl
 *.key
 
 ### Django ###
