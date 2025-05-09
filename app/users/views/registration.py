@@ -1,12 +1,12 @@
 from rest_framework import mixins, viewsets, status, permissions
 from rest_framework.response import Response
 
-from .serializers import UserRegistrationSerializer
+from users.serializers import UserRegistrationSerializer
 
 
 class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
-    POST /api/v1/auth/register/
+    POST /api/v1/users/register/
     """
 
     serializer_class = UserRegistrationSerializer
