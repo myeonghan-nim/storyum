@@ -9,20 +9,18 @@ User = get_user_model()
 @pytest.fixture
 def api_client():
     client = APIClient()
-
     client.defaults["wsgi.url_scheme"] = "https"
     client.defaults["HTTP_X_FORWARDED_PROTO"] = "https"
-
     return client
 
 
 @pytest.fixture
 def register_url():
-    return reverse("auth-register-list")
+    return reverse("users-register-list")
 
 
 @pytest.mark.django_db
-def test_successful_registration(api_client, register_url):
+def test_register_success(api_client, register_url):
     payload = {"email": "testuser@example.com", "username": "testuser", "password": "strongPassword123", "confirm_password": "strongPassword123"}
 
     resp = api_client.post(register_url, payload, format="json")
@@ -47,7 +45,7 @@ def test_successful_registration(api_client, register_url):
         ({"email": "x@example.com", "username": "u", "password": "password123", "confirm_password": "pass123"}, "confirm_password", ["비밀번호는 최소 8자 이상이어야 합니다."]),
     ],
 )
-def test_various_validation_errors(api_client, register_url, payload, field, expected):
+def test_register__fail_validation(api_client, register_url, payload, field, expected):
     if payload.get("email") == "dup@example.com":
         User.objects.create_user(email="dup@example.com", username="dup", password="dummy1234")
 
