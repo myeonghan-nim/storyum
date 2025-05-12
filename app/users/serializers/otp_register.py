@@ -3,11 +3,6 @@ from rest_framework import serializers
 
 
 class OTPRegisterSerializer(serializers.Serializer):
-    """
-    OTP 등록용 Serializer
-    생성된 secret, otpauth_url(provisioning URI)을 반환
-    """
-
     secret = serializers.CharField(read_only=True)
     otpauth_url = serializers.CharField(read_only=True)
 

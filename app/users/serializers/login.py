@@ -7,7 +7,6 @@ class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
 
-    # 아래 필드들은 출력용(read_only)으로 선언
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
     user = serializers.DictField(read_only=True)
@@ -27,7 +26,6 @@ class UserLoginSerializer(serializers.Serializer):
         if not user.is_active:
             raise serializers.ValidationError({"non_field_errors": ["비활성화된 계정입니다."]})
 
-        # JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
 

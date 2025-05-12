@@ -8,10 +8,12 @@ from users.serializers import UserLogoutSerializer
 class UserLogoutViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     """
     POST /api/v1/users/logout/
-    {
-        "refresh": "<리프레시 토큰 문자열>"
-    }
-    → HTTP 204 NO CONTENT
+    - Request body:
+        {
+            "refresh": "refresh_token"
+        }
+    - Response status: 204 NO CONTENT
+    - Response body: None
     """
 
     permission_classes = [IsAuthenticated]

@@ -8,6 +8,24 @@ from users.serializers import UserLoginSerializer
 class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     POST /api/v1/users/login/
+    - Request body:
+        {
+            "email": "sampleuser@email.com",
+            "password": "samplepassword"
+        }
+    - Response status: 200 OK
+    - Response:
+        {
+            "token": {
+                "refresh": "sample_refresh_token",
+                "access": "sample_access_token"
+            },
+            "user": {
+                "id": 1,
+                "email": "sampleuser@email.com",
+                "username": "sampleuser",
+            }
+        }
     """
 
     serializer_class = UserLoginSerializer

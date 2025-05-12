@@ -7,6 +7,21 @@ from users.serializers import UserRegistrationSerializer
 class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     POST /api/v1/users/register/
+    - Request body:
+        {
+            "email": "sampleuser@email.com",
+            "username": "sampleuser",
+            "password": "samplepassword",
+            "confirm_password": "samplepassword"
+        }
+    - Response status: 201 Created
+    - Response body:
+        {
+            "id": 1,
+            "email": "sampleuser@email.com",
+            "username": "sampleuser",
+            "date_joined": "2025-01-01T00:00:00Z"
+        }
     """
 
     serializer_class = UserRegistrationSerializer
