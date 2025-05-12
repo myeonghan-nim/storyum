@@ -34,7 +34,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     )
     confirm_password = serializers.CharField(
         write_only=True,
-        label="비밀번호 확인",
         min_length=8,
         error_messages={
             "min_length": "비밀번호는 최소 8자 이상이어야 합니다.",

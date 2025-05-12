@@ -20,6 +20,7 @@ class UserLoginSerializer(serializers.Serializer):
             user = UserModel.objects.get(email=email)
         except UserModel.DoesNotExist:
             raise serializers.ValidationError({"non_field_errors": ["이메일 또는 비밀번호가 올바르지 않습니다."]})
+
         if not user.check_password(password):
             raise serializers.ValidationError({"non_field_errors": ["이메일 또는 비밀번호가 올바르지 않습니다."]})
 
