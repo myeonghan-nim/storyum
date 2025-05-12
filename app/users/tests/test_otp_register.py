@@ -15,11 +15,9 @@ class TestOTPRegisterAPI:
         self.client.defaults["HTTP_X_FORWARDED_PROTO"] = "https"
 
         login_url = reverse("users-login-list")
-        resp = self.client.post(login_url, {"email": self.user.email, "password": "strong-pass123"}, format="json")
-
-        self.access_token = resp.data["token"]["access"]
-        self.refresh_token = resp.data["token"]["refresh"]
-
+        response = self.client.post(login_url, {"email": self.user.email, "password": "strong-pass123"}, format="json")
+        self.access_token = response.data["token"]["access"]
+        self.refresh_token = response.data["token"]["refresh"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
 
         self.url = "/api/v1/users/otp/register/"
@@ -37,11 +35,11 @@ class TestOTPRegisterAPI:
         assert self.user.otp_enabled is False
 
     def test_otp_register_success_with_rotated_secret(self):
-        resp1 = self.client.post(self.url)
-        secret1 = resp1.json()["secret"]
+        response1 = self.client.post(self.url)
+        secret1 = response1.json()["secret"]
 
-        resp2 = self.client.post(self.url)
-        secret2 = resp2.json()["secret"]
+        response2 = self.client.post(self.url)
+        secret2 = response2.json()["secret"]
 
         assert secret1 != secret2
 
@@ -50,6 +48,7 @@ class TestOTPRegisterAPI:
 
     def test_otp_register_fail_unauthenticated(self):
         self.client.credentials()
+
         response = self.client.post(self.url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

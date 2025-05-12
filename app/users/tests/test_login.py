@@ -36,6 +36,7 @@ class TestUserLoginAPI:
     def test_login_fail_user_inactive(self):
         self.user.is_active = False
         self.user.save()
+
         payload = {"email": "user@example.com", "password": "strong-pass123"}
 
         response = self.client.post(self.url, payload, format="json")
