@@ -1,10 +1,12 @@
 from .otp_register import OTPRegisterViewSet
+from .otp_verify import OTPVerifyViewSet
 from .user_login import UserLoginViewSet
 from .user_logout import UserLogoutViewSet
 from .user_register import UserRegistrationViewSet
 
 __all__ = [
     "OTPRegisterViewSet",
+    "OTPVerifyViewSet",
     "UserLoginViewSet",
     "UserLogoutViewSet",
     "UserRegistrationViewSet",
