@@ -20,7 +20,7 @@ class TestOTPRegisterAPI:
         self.refresh_token = response.data["token"]["refresh"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
 
-        self.url = "/api/v1/users/otp/register/"
+        self.url = reverse("users-otp-register-list")
 
     def test_otp_register_success(self):
         response = self.client.post(self.url)
