@@ -1,13 +1,10 @@
-from .otp_register import OTPRegisterSerializer
-from .otp_verify import OTPVerifySerializer
-from .user_login import UserLoginSerializer
-from .user_logout import UserLogoutSerializer
-from .user_register import UserRegistrationSerializer
+from .otps import OTPRegisterSerializer, OTPVerifySerializer
+from .users import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer
 
 __all__ = [
     "OTPRegisterSerializer",
     "OTPVerifySerializer",
+    "UserRegistrationSerializer",
     "UserLoginSerializer",
     "UserLogoutSerializer",
-    "UserRegistrationSerializer",
 ]
