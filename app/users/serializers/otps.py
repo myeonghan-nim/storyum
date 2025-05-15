@@ -41,3 +41,24 @@ class OTPVerifySerializer(serializers.Serializer):
         user.otp_enabled = True
         user.save(update_fields=["otp_enabled"])
         return {"detail": "OTP가 활성화되었습니다."}
+
+
+class OTPUnregisterSerializer(serializers.Serializer):
+    code = serializers.CharField(write_only=True, help_text="OTP 앱으로 생성된 6자리 코드를 입력하세요.")
+
+    def validate_code(self, value):
+        user = self.context["request"].user
+        if not getattr(user, "otp_secret", None):
+            raise serializers.ValidationError("등록된 OTP가 없습니다.")
+
+        totp = pyotp.TOTP(user.otp_secret)
+        if not totp.verify(value, valid_window=1):
+            raise serializers.ValidationError("유효하지 않은 OTP 코드입니다.")
+        return value
+
+    def save(self):
+        user = self.context["request"].user
+        user.otp_secret = ""
+        user.otp_enabled = False
+        user.save(update_fields=["otp_secret", "otp_enabled"])
+        return {}
