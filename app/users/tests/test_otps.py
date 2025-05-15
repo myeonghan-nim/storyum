@@ -92,3 +92,52 @@ class TestOTPVerifyAPI:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "code" in response.data
         assert response.data["code"][0] == "유효하지 않은 OTP 코드입니다."
+
+
+@pytest.mark.django_db
+class OTPUnregisterAPI:
+    @pytest.fixture(autouse=True)
+    def setup(self, django_user_model):
+        self.user = django_user_model.objects.create_user(email="user@example.com", password="strong-pass123", username="testuser")
+        secret = pyotp.random_base32()
+        self.user.otp_secret = secret
+        self.user.otp_enabled = True
+        self.user.save(update_fields=["otp_secret", "otp_enabled"])
+
+        self.client = APIClient()
+        self.client.defaults["wsgi.url_scheme"] = "https"
+        self.client.defaults["HTTP_X_FORWARDED_PROTO"] = "https"
+
+        login_url = reverse("users-login-list")
+        tokens = self.client.post(login_url, {"email": "user@example.com", "password": "strong-pass123"}, format="json").data
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['token']['access']}")
+
+        self.url = reverse("users-otp-unregister-list")
+
+    def test_unregister_success(self):
+        totp = pyotp.TOTP(self.user.otp_secret)
+        valid_code = totp.now()
+
+        response = self.client.post(self.url, {"code": valid_code}, format="json")
+        assert response.status_code == 200
+        assert response.data.get("detail") == "OTP 등록 해제가 완료되었습니다."
+
+        self.user.refresh_from_db()
+        assert self.user.otp_secret == ""
+        assert self.user.otp_enabled is False
+
+    def test_unregister_fail_no_otp(self):
+        self.user.otp_secret = ""
+        self.user.otp_enabled = False
+        self.user.save(update_fields=["otp_secret", "otp_enabled"])
+
+        response = self.client.post(self.url, {"code": "123456"}, format="json")
+        assert response.status_code == 400
+        assert "code" in response.data
+        assert response.data["code"][0] == "등록된 OTP가 없습니다."
+
+    def test_unregister_fail_invalid_code(self):
+        response = self.client.post(self.url, {"code": "000000"}, format="json")
+        assert response.status_code == 400
+        assert "code" in response.data
+        assert response.data["code"][0] == "유효하지 않은 OTP 코드입니다."
