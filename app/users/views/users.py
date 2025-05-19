@@ -2,7 +2,7 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from users.serializers import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer
+from users.serializers import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer, UserWithdrawalSerializer
 
 
 class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -101,6 +101,27 @@ class UserLogoutViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserWithdrawalViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    POST /api/v1/users/withdraw/
+    - Request body:
+        {
+            "otp_code": "sample_otp_code"
+        }
+    - Response status: 204 NO CONTENT
+    - Response body: None
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserWithdrawalSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

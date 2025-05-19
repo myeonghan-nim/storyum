@@ -1,3 +1,4 @@
+import pyotp
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -115,3 +116,22 @@ class UserLogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail("bad_token")
+
+
+class UserWithdrawalSerializer(serializers.Serializer):
+    otp_code = serializers.CharField(write_only=True, required=False)
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+        if getattr(user, "otp_enabled", False):
+            code = attrs.get("otp_code")
+            if not code:
+                raise serializers.ValidationError({"otp_code": "OTP 코드를 입력해야 합니다."})
+            totp = pyotp.TOTP(user.otp_secret)
+            if not totp.verify(code):
+                raise serializers.ValidationError({"otp_code": "유효하지 않은 OTP 코드입니다."})
+        return attrs
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        user.delete()

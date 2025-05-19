@@ -1,5 +1,5 @@
 from .otps import OTPRegisterSerializer, OTPVerifySerializer, OTPUnregisterSerializer
-from .users import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer
+from .users import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer, UserWithdrawalSerializer
 
 __all__ = [
     "OTPRegisterSerializer",
@@ -8,4 +8,5 @@ __all__ = [
     "UserRegistrationSerializer",
     "UserLoginSerializer",
     "UserLogoutSerializer",
+    "UserWithdrawalSerializer",
 ]

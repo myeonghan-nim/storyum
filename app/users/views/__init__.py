@@ -1,5 +1,5 @@
 from .otps import OTPRegisterViewSet, OTPVerifyViewSet, OTPUnregisterViewSet
-from .users import UserRegistrationViewSet, UserLoginViewSet, UserLogoutViewSet
+from .users import UserRegistrationViewSet, UserLoginViewSet, UserLogoutViewSet, UserWithdrawalViewSet
 
 __all__ = [
     "OTPRegisterViewSet",
@@ -8,4 +8,5 @@ __all__ = [
     "UserRegistrationViewSet",
     "UserLoginViewSet",
     "UserLogoutViewSet",
+    "UserWithdrawalViewSet",
 ]
