@@ -1,3 +1,4 @@
+import pyotp
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -122,3 +123,67 @@ class TestUserLogoutAPI:
         response2 = self.client.post(refresh_url, {"refresh": self.refresh_token}, format="json")
         assert response2.status_code == status.HTTP_401_UNAUTHORIZED
         assert "detail" in response2.data
+
+
+@pytest.mark.django_db
+class TestUserWithdrawalAPI:
+    @pytest.fixture(autouse=True)
+    def setup(self, django_user_model):
+        self.user_model = django_user_model
+        self.user = self.user_model.objects.create_user(email="user@example.com", password="strong-pass123", username="testuser")
+
+        self.client = APIClient()
+        self.client.defaults["wsgi.url_scheme"] = "https"
+        self.client.defaults["HTTP_X_FORWARDED_PROTO"] = "https"
+
+        login_url = reverse("users-login-list")
+        response = self.client.post(login_url, {"email": self.user.email, "password": "strong-pass123"}, format="json")
+        self.access_token = response.data["token"]["access"]
+        self.refresh_token = response.data["token"]["refresh"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+
+        self.url = reverse("users-withdraw-list")
+
+    def test_withdraw_success_without_otp(self):
+        assert not getattr(self.user, "otp_enabled", False)
+
+        response = self.client.post(self.url, {}, format="json")
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        with pytest.raises(self.user_model.DoesNotExist):
+            self.user_model.objects.get(pk=self.user.pk)
+
+    def test_withdraw_success_with_otp(self):
+        secret = pyotp.random_base32()
+        self.user.otp_secret = secret
+        self.user.otp_enabled = True
+        self.user.save()
+
+        totp = pyotp.TOTP(secret)
+        valid_code = totp.now()
+
+        response = self.client.post(self.url, {"otp_code": valid_code}, format="json")
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        with pytest.raises(self.user_model.DoesNotExist):
+            self.user_model.objects.get(pk=self.user.pk)
+
+    def test_withdraw_fail_missing_otp_code(self):
+        secret = pyotp.random_base32()
+        self.user.otp_secret = secret
+        self.user.otp_enabled = True
+        self.user.save()
+
+        response = self.client.post(self.url, {}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "otp_code" in response.data
+
+    def test_withdraw_fail_invalid_otp_code(self):
+        secret = pyotp.random_base32()
+        self.user.otp_secret = secret
+        self.user.otp_enabled = True
+        self.user.save()
+
+        response = self.client.post(self.url, {"otp_code": "000000"}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "유효하지 않은 OTP 코드입니다." in response.data["otp_code"][0]
