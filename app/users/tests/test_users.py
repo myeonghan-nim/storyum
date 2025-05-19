@@ -114,6 +114,24 @@ class TestUserLogoutAPI:
         response = self.client.post(self.url, {"refresh": self.refresh_token}, format="json")
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    def test_logout_fail_no_refresh_token(self):
+        response = self.client.post(self.url, {}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "refresh" in response.data
+
+    def test_logout_fail_invalid_refresh_token(self):
+        response = self.client.post(self.url, {"refresh": "invalid-token"}, format="json")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert "detail" in response.data
+
+    def test_logout_fail_blacklisted_token(self):
+        response1 = self.client.post(self.url, {"refresh": self.refresh_token}, format="json")
+        assert response1.status_code == status.HTTP_204_NO_CONTENT
+
+        response2 = self.client.post(self.url, {"refresh": self.refresh_token}, format="json")
+        assert response2.status_code == status.HTTP_401_UNAUTHORIZED
+        assert "detail" in response2.data
+
     def test_refresh_fail_blacklisted_token(self):
         response1 = self.client.post(self.url, {"refresh": self.refresh_token}, format="json")
         assert response1.status_code == status.HTTP_204_NO_CONTENT

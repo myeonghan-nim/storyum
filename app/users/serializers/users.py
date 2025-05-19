@@ -1,8 +1,10 @@
 import pyotp
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 User = get_user_model()
 
@@ -115,7 +117,7 @@ class UserLogoutSerializer(serializers.Serializer):
         try:
             RefreshToken(self.token).blacklist()
         except TokenError:
-            self.fail("bad_token")
+            raise AuthenticationFailed(detail=self.error_messages["bad_token"], code="bad_token")
 
 
 class UserWithdrawalSerializer(serializers.Serializer):
