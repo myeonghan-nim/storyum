@@ -6,6 +6,7 @@ from .views import (
     OTPRegisterViewSet,
     OTPVerifyViewSet,
     OTPUnregisterViewSet,
+    ProfileViewSet,
     UserLoginViewSet,
     UserLogoutViewSet,
     UserRegistrationViewSet,
@@ -20,6 +21,7 @@ router.register(r"register", UserRegistrationViewSet, basename="users-register")
 router.register(r"login", UserLoginViewSet, basename="users-login")
 router.register(r"logout", UserLogoutViewSet, basename="users-logout")
 router.register(r"withdraw", UserWithdrawalViewSet, basename="users-withdraw")
+router.register(r"profiles", ProfileViewSet, basename="users-profiles")
 
 urlpatterns = [
     path("", include(router.urls)),
