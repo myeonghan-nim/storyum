@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import mixins, viewsets, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -5,26 +7,36 @@ from rest_framework.response import Response
 from users.serializers import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer, UserWithdrawalSerializer
 
 
+@extend_schema(
+    tags=["User Management"],
+    summary="회원가입",
+    description="이메일, 사용자 이름, 비밀번호를 사용하여 회원가입합니다.",
+    request=UserRegistrationSerializer,
+    responses={
+        201: OpenApiResponse(
+            response=UserRegistrationSerializer,
+            description="회원가입 성공",
+            examples=[
+                OpenApiExample(
+                    "회원가입 성공 예시",
+                    summary="정상 가입 후 반환값",
+                    value={"id": 1, "email": "testuser@example.com", "username": "testuser", "date_joined": "2025-01-01T00:00:00Z"},
+                    response_only=True,
+                )
+            ],
+        ),
+        400: OpenApiResponse(OpenApiTypes.OBJECT, description="잘못된 요청입니다. (field: [error, …] 구조)"),
+    },
+    examples=[
+        OpenApiExample(
+            "회원가입 요청 예시",
+            summary="요청 페이로드",
+            value={"email": "testuser@example.com", "username": "testuser", "password": "testpassword", "confirm_password": "testpassword"},
+            request_only=True,
+        )
+    ],
+)
 class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    """
-    POST /api/v1/users/register/
-    - Request body:
-        {
-            "email": "sampleuser@email.com",
-            "username": "sampleuser",
-            "password": "samplepassword",
-            "confirm_password": "samplepassword"
-        }
-    - Response status: 201 Created
-    - Response body:
-        {
-            "id": 1,
-            "email": "sampleuser@email.com",
-            "username": "sampleuser",
-            "date_joined": "2025-01-01T00:00:00Z"
-        }
-    """
-
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
 
@@ -43,29 +55,39 @@ class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         )
 
 
+@extend_schema(
+    tags=["Authentication"],
+    summary="로그인",
+    description="이메일, 비밀번호를 사용하여 로그인합니다.",
+    request=UserLoginSerializer,
+    responses={
+        200: OpenApiResponse(
+            response=UserLoginSerializer,
+            description="로그인 성공",
+            examples=[
+                OpenApiExample(
+                    "로그인 성공 예시",
+                    summary="정상 로그인 후 반환값",
+                    value={
+                        "token": {"refresh": "sample_refresh_token", "access": "sample_access_token"},
+                        "user": {"id": 1, "email": "testuser@example.com", "username": "testuser"},
+                    },
+                    response_only=True,
+                )
+            ],
+        ),
+        400: OpenApiResponse(OpenApiTypes.OBJECT, description="잘못된 요청입니다. (field: [error, …] 구조)"),
+    },
+    examples=[
+        OpenApiExample(
+            "로그인 요청 예시",
+            summary="요청 페이로드",
+            value={"email": "testuser@example.com", "password": "testpassword"},
+            request_only=True,
+        )
+    ],
+)
 class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    """
-    POST /api/v1/users/login/
-    - Request body:
-        {
-            "email": "sampleuser@email.com",
-            "password": "samplepassword"
-        }
-    - Response status: 200 OK
-    - Response:
-        {
-            "token": {
-                "refresh": "sample_refresh_token",
-                "access": "sample_access_token"
-            },
-            "user": {
-                "id": 1,
-                "email": "sampleuser@email.com",
-                "username": "sampleuser",
-            }
-        }
-    """
-
     serializer_class = UserLoginSerializer
     permission_classes = [AllowAny]
 
@@ -85,17 +107,37 @@ class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         )
 
 
+@extend_schema(
+    tags=["Authentication"],
+    summary="로그아웃",
+    description="로그인한 사용자가 로그아웃합니다.",
+    request=UserLogoutSerializer,
+    responses={
+        204: OpenApiResponse(
+            response=UserLogoutSerializer,
+            description="로그아웃 성공",
+            examples=[
+                OpenApiExample(
+                    "로그아웃 성공 예시",
+                    summary="정상 로그아웃 후 반환값",
+                    value=None,
+                    response_only=True,
+                )
+            ],
+        ),
+        400: OpenApiResponse(OpenApiTypes.OBJECT, description="잘못된 요청입니다. (field: [error, …] 구조)"),
+        401: OpenApiResponse(OpenApiTypes.STR, description="Authentication credentials were not provided."),
+    },
+    examples=[
+        OpenApiExample(
+            "로그아웃 요청 예시",
+            summary="요청 페이로드",
+            value={"refresh": "sample_refresh_token"},
+            request_only=True,
+        )
+    ],
+)
 class UserLogoutViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
-    """
-    POST /api/v1/users/logout/
-    - Request body:
-        {
-            "refresh": "refresh_token"
-        }
-    - Response status: 204 NO CONTENT
-    - Response body: None
-    """
-
     permission_classes = [IsAuthenticated]
     serializer_class = UserLogoutSerializer
 
@@ -106,17 +148,37 @@ class UserLogoutViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    tags=["User Management"],
+    summary="회원 탈퇴",
+    description="회원 탈퇴를 요청합니다.",
+    request=UserWithdrawalSerializer,
+    responses={
+        204: OpenApiResponse(
+            response=UserWithdrawalSerializer,
+            description="회원 탈퇴 성공",
+            examples=[
+                OpenApiExample(
+                    "회원 탈퇴 성공 예시",
+                    summary="정상 탈퇴 후 반환값",
+                    value=None,
+                    response_only=True,
+                )
+            ],
+        ),
+        400: OpenApiResponse(OpenApiTypes.OBJECT, description="잘못된 요청입니다. (field: [error, …] 구조)"),
+        401: OpenApiResponse(OpenApiTypes.STR, description="Authentication credentials were not provided."),
+    },
+    examples=[
+        OpenApiExample(
+            "회원 탈퇴 요청 예시",
+            summary="요청 페이로드",
+            value={"otp_code": "sample_otp_code"},
+            request_only=True,
+        )
+    ],
+)
 class UserWithdrawalViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    """
-    POST /api/v1/users/withdraw/
-    - Request body:
-        {
-            "otp_code": "sample_otp_code"
-        }
-    - Response status: 204 NO CONTENT
-    - Response body: None
-    """
-
     permission_classes = [IsAuthenticated]
     serializer_class = UserWithdrawalSerializer
 

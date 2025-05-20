@@ -230,4 +230,11 @@ SPECTACULAR_SETTINGS = {
     "SWAGGER_UI_DIST": "SIDECAR",
     "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
     "REDOC_DIST": "SIDECAR",
+    "SORT_TAGS": True,
+    "TAGS": [
+        {"name": "User Management", "description": "회원가입/탈퇴", "x-order": 1},
+        {"name": "Authentication", "description": "로그인/아웃", "x-order": 2},
+        {"name": "OTP", "description": "2단계 인증", "x-order": 3},
+        {"name": "Profile", "description": "프로필 관리", "x-order": 4},
+    ],
 }
